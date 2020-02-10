@@ -1,0 +1,3 @@
+[submodule "MatlabWebSocket.git"]
+	path = MatlabWebSocket
+	url = git@github.com:jebej/MatlabWebSocket.git
