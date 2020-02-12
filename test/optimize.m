@@ -14,7 +14,7 @@ function optimize(maxGeneration)
     [evaluateW, cleanUp] = wrapper(@evaluate);
     
     for i = 1:maxGeneration
-        X = randn(1, 10);
+        X = randn(30, 13);
         Y = evaluateW(X);
         Y
     end
