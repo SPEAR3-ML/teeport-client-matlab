@@ -3,6 +3,7 @@ classdef EvaluatorClient < WebSocketClient
     %   Detailed explanation goes here
     
     properties
+        id
         evaluate
     end
     
@@ -10,6 +11,7 @@ classdef EvaluatorClient < WebSocketClient
         function obj = EvaluatorClient(varargin)
             %Constructor
             obj@WebSocketClient(varargin{:});
+            obj.id = '';
             obj.evaluate = [];
         end
         
@@ -27,14 +29,14 @@ classdef EvaluatorClient < WebSocketClient
         function onTextMessage(obj,message)
             % Blabla
             msg = jsondecode(message);
-            if msg.type == 'evaluate'
+            if strcmp(msg.type,'hello')
+                obj.id = msg.id;
+            elseif strcmp(msg.type,'evaluate')
+                taskId = msg.taskId;
                 X = msg.data;
                 Y = obj.evaluate(X);
                 
-                res = struct('type', 'evaluated', ...
-                    'taskId', msg.taskId, ...
-                    'gen', msg.gen, ...
-                    'data', Y);
+                res = struct('type', 'evaluated', 'taskId', taskId, 'data', Y);
                 obj.send(jsonencode(res));
             else
                 fprintf('%s\n',message);

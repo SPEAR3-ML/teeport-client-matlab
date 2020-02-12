@@ -3,16 +3,20 @@ classdef AlgorithmClient < WebSocketClient
     %   Detailed explanation goes here
     
     properties
+        id
+        taskId
         returned
-        current_Y
+        currentY
     end
     
     methods
         function obj = AlgorithmClient(varargin)
             %Constructor
             obj@WebSocketClient(varargin{:});
+            obj.id = '';
+            obj.taskId = '';
             obj.returned = 0;
-            obj.current_Y = [];
+            obj.currentY = [];
         end
     end
     
@@ -25,9 +29,13 @@ classdef AlgorithmClient < WebSocketClient
         function onTextMessage(obj,message)
             % Blabla
             msg = jsondecode(message);
-            if msg.type == 'evaluated'
+            if strcmp(msg.type,'hello')
+                obj.id = msg.id;
+            elseif strcmp(msg.type,'taskCreated')
+                obj.taskId = msg.id;
+            elseif strcmp(msg.type,'evaluated')
                 Y = msg.data;
-                obj.current_Y = Y;
+                obj.currentY = Y;
                 obj.returned = 1;
             else
                 fprintf('%s\n',message);
