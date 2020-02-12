@@ -1,4 +1,4 @@
-function evaluateW = wrapper(evaluate)
+function [evaluateW, cleanUp] = wrapper(evaluate)
     uri = 'ws://zeta:8080/';
     
     % Setup algorithm client
@@ -17,6 +17,10 @@ function evaluateW = wrapper(evaluate)
         'algorithmId', algorithmId, 'evaluatorId', evaluatorId);
     algorithm.send(jsonencode(newTask));
     waitfor(algorithm, 'taskId');
+    
+    % Start the task
+    startTask = struct('type', 'startTask', 'id', algorithm.taskId);
+    algorithm.send(jsonencode(startTask));
 
     function Y = wrapped(X)
         point = struct('type', 'evaluate', 'data', X);
@@ -25,6 +29,16 @@ function evaluateW = wrapper(evaluate)
         algorithm.returned = 0;
         Y = algorithm.currentY;
     end
+
+    function disconnect()
+        % Complete the task
+        completeTask = struct('type', 'completeTask', 'id', algorithm.taskId);
+        algorithm.send(jsonencode(completeTask));
+        
+        algorithm.close();
+        evaluator.close();
+    end
     
     evaluateW = @wrapped;
+    cleanUp = @disconnect;
 end
