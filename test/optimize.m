@@ -1,22 +1,25 @@
-function optimize(max_generation)
+function optimize(maxGeneration)
     switch nargin
       case 0
-        max_generation = [];
+        maxGeneration = [];
       case 1
       otherwise
         error('1 input is accepted')
     end
-    if isempty(max_generation)
-        max_generation = 10;
+    if isempty(maxGeneration)
+        maxGeneration = 10;
     end
     
-    w_evaluate = wrapper(@evaluate);
+%     evaluateW = wrapper(@evaluate);
+    [evaluateW, cleanUp] = wrapper(@evaluate);
     
-    for i = 1:max_generation
+    for i = 1:maxGeneration
         X = randn(1, 10);
-        Y = w_evaluate(X);
+        Y = evaluateW(X);
         Y
     end
+    
+    cleanUp();
 end
 
 function Y = evaluate(X)
