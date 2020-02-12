@@ -7,10 +7,16 @@ function [evaluateW, cleanUp] = wrapper(evaluate)
     algorithmId = algorithm.id;
     
     % Setup evaluator client
-    evaluator = EvaluatorClient(join([uri, '?type=evaluator']));
-    waitfor(evaluator, 'id');
-    evaluatorId = evaluator.id;
-    evaluator.setEvaluate(evaluate);
+    if ischar(evaluate)
+        evaluator = 0;
+        evaluatorId = evaluate;
+    else
+        evaluator = EvaluatorClient(join([uri, '?type=evaluator']));
+        waitfor(evaluator, 'id');
+        evaluatorId = evaluator.id;
+        evaluator.setEvaluate(evaluate);
+    end
+    
     
     % Init a new task
     newTask = struct('type', 'newTask', ...
@@ -36,7 +42,9 @@ function [evaluateW, cleanUp] = wrapper(evaluate)
         algorithm.send(jsonencode(completeTask));
         
         algorithm.close();
-        evaluator.close();
+        if evaluator ~= 0
+            evaluator.close();
+        end
     end
     
     evaluateW = @wrapped;
