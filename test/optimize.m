@@ -1,4 +1,11 @@
 function optimize(max_generation)
+    switch nargin
+      case 0
+        max_generation = [];
+      case 1
+      otherwise
+        error('1 input is accepted')
+    end
     if isempty(max_generation)
         max_generation = 10;
     end
