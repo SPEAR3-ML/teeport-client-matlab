@@ -12,6 +12,7 @@ function optimize(maxGeneration)
     
 %     evaluateW = wrapper(@evaluate);
     [evaluateW, cleanUp] = wrapper(@evaluate);
+%     [evaluateW, cleanUp] = wrapper('evaluatorId');
     
     for i = 1:maxGeneration
         X = randn(30, 13);
@@ -23,5 +24,6 @@ function optimize(maxGeneration)
 end
 
 function Y = evaluate(X)
-    Y = sum(X);
+%     pause(1);
+    Y = sum(X, 2);
 end
