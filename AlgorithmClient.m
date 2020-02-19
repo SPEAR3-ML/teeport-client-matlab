@@ -6,6 +6,7 @@ classdef AlgorithmClient < WebSocketClient
         id
         taskId
         returned
+        cancelled
         currentY
     end
     
@@ -16,6 +17,7 @@ classdef AlgorithmClient < WebSocketClient
             obj.id = '';
             obj.taskId = '';
             obj.returned = 0;
+            obj.cancelled = 0;
             obj.currentY = [];
         end
     end
@@ -37,6 +39,9 @@ classdef AlgorithmClient < WebSocketClient
                 Y = msg.data;
                 obj.currentY = Y;
                 obj.returned = 1;
+            elseif strcmp(msg.type,'stopTask')
+                obj.returned = 1;
+                obj.cancelled = 1;
             else
                 fprintf('%s\n',message);
             end

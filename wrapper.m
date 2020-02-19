@@ -17,7 +17,6 @@ function [evaluateW, cleanUp] = wrapper(evaluate)
         evaluator.setEvaluate(evaluate);
     end
     
-    
     % Init a new task
     newTask = struct('type', 'newTask', ...
         'algorithmId', algorithmId, 'evaluatorId', evaluatorId);
@@ -32,6 +31,13 @@ function [evaluateW, cleanUp] = wrapper(evaluate)
         point = struct('type', 'evaluate', 'data', X);
         algorithm.send(jsonencode(point));
         waitfor(algorithm, 'returned', 1);
+        if algorithm.cancelled
+            algorithm.close();
+            if evaluator ~= 0
+                evaluator.close();
+            end
+            error('task has been cancelled');
+        end
         algorithm.returned = 0;
         Y = algorithm.currentY;
     end
