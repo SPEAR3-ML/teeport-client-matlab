@@ -1,24 +1,22 @@
-classdef AlgorithmClient < WebSocketClient
+classdef ProcessorClient < WebSocketClient
     %CLIENT Summary of this class goes here
     %   Detailed explanation goes here
     
     properties
         id
-        taskId
-        returned
-        cancelled
-        currentY
+        process
     end
     
     methods
-        function obj = AlgorithmClient(varargin)
+        function obj = ProcessorClient(varargin)
             %Constructor
             obj@WebSocketClient(varargin{:});
             obj.id = '';
-            obj.taskId = '';
-            obj.returned = 0;
-            obj.cancelled = 0;
-            obj.currentY = [];
+            obj.process = [];
+        end
+        
+        function setProcess(obj, process)
+            obj.process = process;
         end
     end
     
@@ -33,19 +31,13 @@ classdef AlgorithmClient < WebSocketClient
             msg = jsondecode(message);
             if strcmp(msg.type,'hello')
                 obj.id = msg.id;
-            elseif strcmp(msg.type,'taskCreated')
-                obj.taskId = msg.id;
-            elseif strcmp(msg.type,'evaluated')
-                Y = msg.data;
-                obj.currentY = Y;
-                obj.returned = 1;
-            elseif strcmp(msg.type,'stopTask')
-                obj.returned = 1;
-                obj.cancelled = 1;
-            elseif strcmp(msg.type,'processed')
-                Y = msg.data;
-                obj.currentY = Y;
-                obj.returned = 1;
+            elseif strcmp(msg.type,'process')
+                commanderId = msg.commanderId;
+                X = msg.data;
+                Y = obj.process(X);
+                
+                res = struct('type', 'processed', 'commanderId', commanderId, 'data', Y);
+                obj.send(jsonencode(res));
             else
                 fprintf('%s\n',message);
             end
