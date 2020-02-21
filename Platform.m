@@ -49,7 +49,7 @@ classdef Platform < handle
                 obj.algorithm.send(jsonencode(point));
                 waitfor(obj.algorithm, 'returned', 1);
                 if obj.algorithm.cancelled
-                    obj.cleanUp();
+                    obj.close();
                     error('task has been cancelled');
                 end
                 obj.algorithm.returned = 0;
@@ -90,6 +90,10 @@ classdef Platform < handle
                 point = struct('type', 'process', 'data', X, 'processorId', processor.id);
                 obj.algorithm.send(jsonencode(point));
                 waitfor(obj.algorithm, 'returned', 1);
+                if obj.algorithm.cancelled
+                    obj.close();
+                    error('task has been cancelled');
+                end
                 obj.algorithm.returned = 0;
                 Y = obj.algorithm.currentY;
             end
