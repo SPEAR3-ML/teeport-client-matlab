@@ -111,8 +111,10 @@ classdef Platform < handle
         end
         
         function cleanUp(obj)
-            completeTask = struct('type', 'completeTask', 'id', obj.algorithm.taskId);
-            obj.algorithm.send(jsonencode(completeTask));
+            if isobject(obj.algorithm)
+                completeTask = struct('type', 'completeTask', 'id', obj.algorithm.taskId);
+                obj.algorithm.send(jsonencode(completeTask));
+            end
             obj.close();
         end
         
