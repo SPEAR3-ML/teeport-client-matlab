@@ -45,7 +45,7 @@ classdef Platform < handle
             obj.algorithm.send(jsonencode(startTask));
 
             function Y = wrappedFunc(X)
-                point = struct('type', 'evaluate', 'data', X);
+                point = struct('type', 'evaluate', 'data', normalizeMatrixByJson(X));
                 obj.algorithm.send(jsonencode(point));
                 waitfor(obj.algorithm, 'returned', 1);
                 if obj.algorithm.cancelled

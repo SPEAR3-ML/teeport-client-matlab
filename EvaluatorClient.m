@@ -36,7 +36,7 @@ classdef EvaluatorClient < WebSocketClient
                 X = msg.data;
                 Y = obj.evaluate(X);
                 
-                res = struct('type', 'evaluated', 'taskId', taskId, 'data', Y);
+                res = struct('type', 'evaluated', 'taskId', taskId, 'data', normalizeMatrixByJson(Y));
                 obj.send(jsonencode(res));
             else
                 fprintf('%s\n',message);
