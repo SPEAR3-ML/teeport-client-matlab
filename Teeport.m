@@ -1,28 +1,28 @@
-classdef Platform < handle
-    %Platform Summary of this class goes here
+classdef Teeport < handle
+    %Teeport Summary of this class goes here
     %   Detailed explanation goes here
     
     properties (Access = protected)
         uri
-        algorithm
+        optimizer
         evaluator
         processors
     end
     
     methods
-        function obj = Platform(uri)
+        function obj = Teeport(uri)
             %Constructor
             obj.uri = uri;
-            obj.algorithm = [];
+            obj.optimizer = [];
             obj.evaluator = [];
             obj.processors = {};
         end
         
         function evaluate = useEvaluator(obj, func)
-            % Setup algorithm client
-            if ~isobject(obj.algorithm)
-                obj.algorithm = AlgorithmClient(join([obj.uri, '?type=algorithm']));
-                waitfor(obj.algorithm, 'id');
+            % Setup optimizer client
+            if ~isobject(obj.optimizer)
+                obj.optimizer = OptimizerClient(join([obj.uri, '?type=optimizer']));
+                waitfor(obj.optimizer, 'id');
             end
 
             % Setup evaluator client
@@ -36,24 +36,24 @@ classdef Platform < handle
 
             % Init a new task
             newTask = struct('type', 'newTask', ...
-                'algorithmId', obj.algorithm.id, 'evaluatorId', obj.evaluator.id);
-            obj.algorithm.send(jsonencode(newTask));
-            waitfor(obj.algorithm, 'taskId');
+                'optimizerId', obj.optimizer.id, 'evaluatorId', obj.evaluator.id);
+            obj.optimizer.send(jsonencode(newTask));
+            waitfor(obj.optimizer, 'taskId');
 
             % Start the task
-            startTask = struct('type', 'startTask', 'id', obj.algorithm.taskId);
-            obj.algorithm.send(jsonencode(startTask));
+            startTask = struct('type', 'startTask', 'id', obj.optimizer.taskId);
+            obj.optimizer.send(jsonencode(startTask));
 
             function Y = wrappedFunc(X)
                 point = struct('type', 'evaluate', 'data', normalizeMatrixByJson(X));
-                obj.algorithm.send(jsonencode(point));
-                waitfor(obj.algorithm, 'returned', 1);
-                if obj.algorithm.cancelled
+                obj.optimizer.send(jsonencode(point));
+                waitfor(obj.optimizer, 'returned', 1);
+                if obj.optimizer.cancelled
                     obj.close();
                     error('task has been cancelled');
                 end
-                obj.algorithm.returned = 0;
-                Y = obj.algorithm.currentY;
+                obj.optimizer.returned = 0;
+                Y = obj.optimizer.currentY;
             end
 
             evaluate = @wrappedFunc;
@@ -68,10 +68,10 @@ classdef Platform < handle
         end
         
         function process = useProcessor(obj, func)
-            % Setup algorithm client
-            if ~isobject(obj.algorithm)
-                obj.algorithm = AlgorithmClient(join([obj.uri, '?type=algorithm']));
-                waitfor(obj.algorithm, 'id');
+            % Setup optimizer client
+            if ~isobject(obj.optimizer)
+                obj.optimizer = OptimizerClient(join([obj.uri, '?type=optimizer']));
+                waitfor(obj.optimizer, 'id');
             end
 
             % Setup processor client
@@ -88,14 +88,14 @@ classdef Platform < handle
 
             function Y = wrappedFunc(X)
                 point = struct('type', 'process', 'data', X, 'processorId', processor.id);
-                obj.algorithm.send(jsonencode(point));
-                waitfor(obj.algorithm, 'returned', 1);
-                if obj.algorithm.cancelled
+                obj.optimizer.send(jsonencode(point));
+                waitfor(obj.optimizer, 'returned', 1);
+                if obj.optimizer.cancelled
                     obj.close();
                     error('task has been cancelled');
                 end
-                obj.algorithm.returned = 0;
-                Y = obj.algorithm.currentY;
+                obj.optimizer.returned = 0;
+                Y = obj.optimizer.currentY;
             end
 
             process = @wrappedFunc;
@@ -111,16 +111,16 @@ classdef Platform < handle
         end
         
         function cleanUp(obj)
-            if isobject(obj.algorithm)
-                completeTask = struct('type', 'completeTask', 'id', obj.algorithm.taskId);
-                obj.algorithm.send(jsonencode(completeTask));
+            if isobject(obj.optimizer)
+                completeTask = struct('type', 'completeTask', 'id', obj.optimizer.taskId);
+                obj.optimizer.send(jsonencode(completeTask));
             end
             obj.close();
         end
         
         function close(obj)
-            if isobject(obj.algorithm)
-                obj.algorithm.close();
+            if isobject(obj.optimizer)
+                obj.optimizer.close();
             end
             if isobject(obj.evaluator)
                 obj.evaluator.close();

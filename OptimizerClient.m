@@ -1,4 +1,4 @@
-classdef AlgorithmClient < WebSocketClient
+classdef OptimizerClient < WebSocketClient
     %CLIENT Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -11,7 +11,7 @@ classdef AlgorithmClient < WebSocketClient
     end
     
     methods
-        function obj = AlgorithmClient(varargin)
+        function obj = OptimizerClient(varargin)
             %Constructor
             obj@WebSocketClient(varargin{:});
             obj.id = '';
