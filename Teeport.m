@@ -21,7 +21,7 @@ classdef Teeport < handle
         function evaluate = useEvaluator(obj, func)
             % Setup optimizer client
             if ~isobject(obj.optimizer)
-                obj.optimizer = OptimizerClient(join([obj.uri, '?type=optimizer']));
+                obj.optimizer = OptimizerClient(join([obj.uri, '?type=optimizer&private=True']));
                 waitfor(obj.optimizer, 'id');
             end
 
@@ -29,7 +29,7 @@ classdef Teeport < handle
             if ischar(func)
                 obj.evaluator = struct('id', func);
             else
-                obj.evaluator = EvaluatorClient(join([obj.uri, '?type=evaluator']));
+                obj.evaluator = EvaluatorClient(join([obj.uri, '?type=evaluator&private=True']));
                 waitfor(obj.evaluator, 'id');
                 obj.evaluator.setEvaluate(func);
             end
@@ -70,7 +70,7 @@ classdef Teeport < handle
         function process = useProcessor(obj, func)
             % Setup optimizer client
             if ~isobject(obj.optimizer)
-                obj.optimizer = OptimizerClient(join([obj.uri, '?type=optimizer']));
+                obj.optimizer = OptimizerClient(join([obj.uri, '?type=optimizer&private=True']));
                 waitfor(obj.optimizer, 'id');
             end
 
@@ -80,7 +80,7 @@ classdef Teeport < handle
                 processor = struct('id', func);
                 obj.processors{end + 1} = processor;
             else
-                processor = ProcessorClient(join([obj.uri, '?type=processor']));
+                processor = ProcessorClient(join([obj.uri, '?type=processor&private=True']));
                 waitfor(processor, 'id');
                 processor.setProcess(func);
                 obj.processors{end + 1} = processor;
