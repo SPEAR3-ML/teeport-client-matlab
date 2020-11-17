@@ -3,6 +3,17 @@ Platform plugin for matlab
 
 This plugin uses MatlabWebSocket, which is a simple library consisting of a websocket server and client for MATLAB  built on [Java-WebSocket](https://github.com/TooTallNate/Java-WebSocket), a java implementation of the websocket protocol. Encryption is supported with self-signed certificates made with the java keytool.
 
+Preparation
+-----------
+
+Make sure that you have Git 2.13 or higher on your computer, then:
+
+```bash
+git clone --recurse-submodules https://github.com/SPEAR3-ML/teeport-client-matlab.git
+```
+
+To clone both the source code and the submodules (MatlabWebSocket).
+
 Installation
 ------------
 
